@@ -10,28 +10,32 @@
 #include<string.h>
 #include<unistd.h>
 
-#define BOOL int
-#define LINK_LIST_EMENTY 0
-#define LINK_LIST_UNEMENTY 1
+#define _bool_      int
+#define _true_      0
+#define _false_     1
+#define _empty_     0
+#define _unempty_   1
 
-typedef int ElementType;
+typedef int elementType;
 
 typedef struct node
 {
-    ElementType data;
-    struct node *next;
+    elementType  data;
+    struct node* next;
 }Node;
+#define size_node sizeof(Node)
 
-typedef Node *List;
+typedef Node* List;
 
-/*创建空链表*/
-List MakeEmpty(void)
+/*链表初始化*/
+List listInit()
 {
-    Node *l;
-    l = (Node*)malloc(sizeof(Node));
-    if(l == NULL)
+    Node* l = NULL;
+
+    l = (Node*)malloc(size_node);
+    if(NULL == l)
     {
-        printf("申请内存失败!\n");
+        printf("内存分配失败\n");
 
         return NULL;
     }
@@ -42,107 +46,123 @@ List MakeEmpty(void)
     return l;
 }
 
-/*判断链表是否为空*/
-BOOL Is_Ementy(List L)
+_bool_ isEmpty(const List l)
 {
-    if (NULL == L->next)
+    if(NULL == l)
     {
-        return LINK_LIST_EMENTY;
+        printf("链表异常\n");
+        
+        exit(1);
+    }
+    if(NULL == l->next)
+    {
+        return _empty_;
     }
     else
     {
-        return LINK_LIST_UNEMENTY;
+        return _unempty_;
     }
 }
 
-/*得到链表头节点*/
-List GetHead(List L)
+/*获取链表头*/
+List getLHead(const List l)
 {
-    if (NULL != L)
+    if(NULL == l)
     {
-        return L;
-    }
-    else
-    {
-        return NULL;
-    }
-}
+        printf("链表异常\n");
 
-/*得到第一个节点*/
-Node *GetFirst(List L)
-{
-    if (0 == Is_Ementy(L))
-    {
-        printf("List Ementy!\n");
-        return NULL;
+        exit(1);
     }
 
-    Node *p = L;
-    
-    p = p->next;
+    Node* p = l;
 
     return p;
 }
 
-/*得到链表长度*/
-int GetLength(List L)
+/*获取链表第一个节点*/
+Node* getLFNode(const List l)
 {
-    if (0 == Is_Ementy(L))
+    if(NULL != l && NULL != l->next)
     {
-        printf("List Ementy!\n");
+        Node* p = l->next;
+
+        return p;
+    }
+    else
+    {
+        return NULL;
+    }
+}
+
+/*获取链表长度*/
+int getLLen(const List l)
+{
+    if(_empty_ == isEmpty(l))
+    {
+        printf("empty...!\n");
+
         return 0;
     }
 
-    int length = 0;
-    while (NULL != L->next)
+    int len = 0;
+    Node* p = l->next;
+
+    while(NULL != p)
     {
-        ++length;
-        L = L->next;
+        ++len;
+        p = p->next;
     }
 
-    return length;
+    return len;
 }
 
-/*得到元素所在位置*/
-int *GetPoint(List L, ElementType data)
+/*获取元素所在位置*/
+int* getEPos(const List l, elementType data)
 {
-    if (0 == Is_Ementy(L))
+    if(_empty_ == isEmpty(l))
     {
-        printf("List Ementy!\n");
+        printf("empty...\n");
+
         return NULL;
     }
 
-    int *arr;
-    arr = malloc(sizeof(int) * (GetLength(L)));
-    memset(arr, 0 , sizeof(GetLength(L)));
-
+    Node* p = l->next;
     int count = 0;
-    while (NULL != L->next)
+    int len = getLLen(l);
+    int* arr = malloc(sizeof(int) * len);
+    memset(arr, 0 , len);
+
+    while(NULL != p)
     {
-        L = L->next;
-        if (data == L->data)
+        p = p->next;
+        if(data == p->data)
         {
             arr[count] = 1;
         }
         ++count;
     }
 
+    free(arr);
+    arr = NULL;
+    p = NULL;
+
     return arr;
 }
 
-/*查找第i个元素*/
-Node* GetNode(List L, int point)
+/*获取i号位置元素*/
+Node* getINode(const List l, int pos)
 {
-    if (0 == Is_Ementy(L))
+    if(_empty_ == isEmpty(l))
     {
-        printf("List Ementy!\n");
+        printf("empty...\n");
+
         return NULL;
     }
 
-    Node *p = L;
+    Node* p = l->next;
+    int i = 1;
 
-    int i = 0;
-    while (p != NULL && i < point)    /*当未查找到链尾且i小于num时继续查找*/
+    while(NULL != p && i < pos)
     {
         p = p->next;
         ++i;
@@ -152,104 +172,99 @@ Node* GetNode(List L, int point)
 }
 
 /*头插法*/
-List InsertHead(List L, ElementType data)
+List insertHead(List const l, elementType data)
 {
-    Node *temp;
-    temp = (Node*)malloc(sizeof(Node));
-    temp->data = data;
-    temp->next = NULL;
-
-    Node *p = L;
-    p = p->next;
-    L->next = temp;
-    (L->next)->next = p;
-
-    return L;
-}
-
-/*尾插法*/
-List InsertTail(List L, ElementType data)
-{
-    Node *temp;
-    temp = (Node*)malloc(sizeof(Node));
-    temp->data = data;
-    temp->next = NULL;
-
-    Node *p = L;
-    while (p->next != NULL)
-    {
-        p = p->next;
-    }
-
-    p->next = temp;
-    
-    return L;
-}
-
-/*在链表第i个位置插入元素*/
-List InsertElement(List L, int point, ElementType data)
-{
-    if (0 == Is_Ementy(L))
-    {
-        printf("List Ementy!\n");
-        return NULL;
-    }
-
-    if (0 == point)
-    {
-        printf("error: point == 0\n");
-        exit(1);    /*异常终止*/
-    }
-
-    Node *tmp;
-    tmp = (Node*)malloc(sizeof(Node));
+    Node* tmp = (Node*)malloc(size_node);
     tmp->data = data;
     tmp->next = NULL;
 
-    Node *p = GetNode(L, point - 1); 
+    Node* p = l->next;
+    l->next = tmp;          //tmp->next = p;
+    (l->next)->next = p;    //l->next = tmp;
+
+    return l;
+}
+
+/*尾插法*/
+List insertTail(List const l, elementType data)
+{
+    Node* tmp = (Node*)malloc(size_node);
+    tmp->data = data;
+    tmp->next = NULL;
+    
+    Node* p = l;
+    while(NULL != p->next)
+    {
+        p = p->next;
+    }
+    p->next = tmp;
+    
+    return l;
+}
+
+/*链表第i号位插入元素*/
+List insertIPos(List const l, elementType data, int pos)
+{
+    if(_empty_ == isEmpty(l))
+    {
+        printf("empty...\n");
+
+        return NULL;
+    }
+    if(0 == pos)
+    {
+        printf("pos范围：1~n\n");
+
+        return NULL;
+    }
+
+    Node* tmp = (Node*)malloc(size_node);
+    tmp->data = data;
+    tmp->next = NULL;
+
+    Node* p = getINode(l, pos - 1); 
 
     tmp->next = p->next;
     p->next = tmp;
 
-    return L;
+    return l;
 }
 
 /*删除第i个元素*/
-void DeleteElement(List L, int point)
+_bool_ deleteIPos(List const l, int pos)
 {
-    if (0 == Is_Ementy(L))
+    if(_empty_ == isEmpty(l))
     {
-        printf("List Ementy!\n");
-        return;
-    }
+        printf("empty...\n");
 
-    if (0 == point)
+        return _false_;
+    }
+    if(0 == pos)
     {
-        printf("error: num == 0\n");
-        exit(1);
+        printf("pos范围：1~n\n");
+
+        return _false_;
     }
     
-    Node *p = GetNode(L, point - 1);
+    Node* p = getINode(l, pos - 1);
 
-    Node *q;
-    q = (Node*)malloc(sizeof(Node));
+    Node* q = (Node*)malloc(size_node);
 
-    if (p == NULL)
+    if(NULL == p)
     {
-        printf("第%d个节点不存在!\n", point - 1);
+        printf("第%d个节点不存在!\n", pos - 1);
     }
     else
     {
-        if (p->next == NULL)
+        if(NULL == p->next)
         {
-            printf("第%d个节点不存在!\n", point);
+            printf("第%d个节点不存在!\n", pos);
         }
         else
         {
             q = p->next;
             p->next = q->next;
 
-            /*回收临时变量内存*/
             q->next = NULL;
             free(q);
             q = NULL;
@@ -257,131 +272,110 @@ void DeleteElement(List L, int point)
     }
 }
 
-/*清空链表*/
-void ClearList(List L)
+/*链表置数*/
+_bool_ memsetList(List const l, elementType data)
 {
-    L->next = NULL;
+    if(_empty_ == isEmpty(l))
+    {
+        return _false_;
+    }
+    
+    Node* p = l->next;
+    while(NULL != p)
+    {
+        p->data = data;
+        p = p->next;
+    }
+
+    return _true_;
 }
 
-/*摧毁链表*/
-List DestroyList(List L)
+/*销毁链表*/
+List destroyList(List l)
 {
-    free(L);
-    L = NULL;
+    Node* p = l;
+    while(NULL != l)
+    {
+        p = l;
+        l = p->next;
+        
+        free(p);
+        p = NULL;
+    }
 
-    return L;
+    return l;
 }
 
 /*打印链表*/
-void PrintList(List L)
+void printList(const List const l)
 {
-    if (0 == Is_Ementy(L))
+    if (_empty_ == isEmpty(l))
     {
-        printf("List Ementy!\n");
+        printf("empty...\n");
+
         return;
     }
 
-    while(L->next != NULL)
+    Node* p = l->next;
+    while(NULL != p)
     {
-        L = L->next;
-        printf("%d\t", L->data);
+        printf("%d\t", p->data);
+        p = p->next;
     }
-    putchar(10);
+    printf("\n");
+
+    p = NULL;
 }
 
 /*打印一维数组*/
-void PrintArr(int *arr, int length)
+void printArr(const int* const arr, int len)
 {
-    for (int i = 0; i < length; ++ i)
+    const int* p = arr;
+    int i = 0;
+    for (; i < len; ++i)
     {
-        printf("%d\t", arr[i]);
+        printf("%d\t", p[i]);
     }
-    putchar(10);
-}
+    printf("\n");
 
-/*菜单函数*/
-void Menu()
-{
-    printf("-------------------------------\n");
-    printf("===============================\n");
-
-    printf("1---------展示链表集\n");
-    printf("2---------选择子链表\n");
-    printf("3---------建立子链表\n");
-    printf("4---------摧毁子链表\n");
-    printf("0---------退出\n");
-
-    printf("-------------------------------\n");
-    printf("===============================\n");
+    p = NULL;
 }
 
 int main()
 {
-    List list = MakeEmpty();
+    List list = listInit();
+
+    list = insertHead(list, 4);
+    list = insertHead(list, 3);
+    list = insertHead(list, 2);
+    list = insertHead(list, 1);
+    printf("len=%d\n", getLLen(list));
+    printList(list);
+
+    list = insertIPos(list, 5, 5);
+    list = insertIPos(list, 6, 6);
+    printf("len=%d\n", getLLen(list));
+    printList(list);
+
+    list = insertTail(list, 7);
+    list = insertTail(list, 8);
+    list = insertTail(list, 9);
+    list = insertTail(list, 10);
+    printf("len=%d\n", getLLen(list));
+    printList(list);
+
+    deleteIPos(list, 4);
+    deleteIPos(list, 4);
+    deleteIPos(list, 4);
+    deleteIPos(list, 4);
+    printf("len=%d\n", getLLen(list));
+    printList(list);
+
+    memsetList(list, 0);
+    printf("len=%d\n", getLLen(list));
+    printList(list);
+
+    list = destroyList(list);
     
-    int chosen = 0;
-    do
-    {
-        Menu();
-
-        printf("请输入您的选择：<0~5>\n");
-        scanf("%d", &chosen);
-
-        switch(chosen)
-        {
-            case 0:
-                printf("正在退出系统...\n");
-                break;
-            case 1:
-                printf("展示链表集.\n");
-                break;
-            case 2:
-                printf("选择子链表.\n");
-                break;
-            case 3:
-                printf("建立子链表.\n");
-                break;
-            case 4:
-                printf("摧毁子链表.\n");
-                break;
-            default:
-                printf("<请输入整形数字０～５!>\n");
-        }
-
-    }while(0 != chosen);
-    
-    list = InsertTail(list, 10);
-    list = InsertHead(list, 2);
-    list = InsertHead(list, 2);
-    list = InsertTail(list, 2);
-    list = InsertTail(list, 9);
-    list = InsertHead(list, 2);
-    
-    Node *value = GetFirst(list);
-
-    PrintList(list);
-    printf("First Node: %d\n", value->data);
-    printf("length= %d\n", GetLength(list));
-    //PrintArr(GetPoint(list, 2), GetLength(list));
-
-    Node *temp = GetNode(list, 4);
-    printf("Get0 Node: %d\n", temp->data);
-
-    ClearList(list);
-    
-    PrintList(list);
-
-    sleep(2);
-
-    list = InsertTail(list, 10);
-    list = InsertHead(list, 2);
-    list = InsertHead(list, 2);
-    list = InsertTail(list, 2);
-    list = InsertTail(list, 9);
-    list = InsertHead(list, 2);
-
-    PrintList(list);
-
-    list =  DestroyList(list);
     return 0;
 }
