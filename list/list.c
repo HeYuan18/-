@@ -141,9 +141,6 @@ int* getEPos(const List l, elementType data)
         }
         ++count;
     }
-
-    free(arr);
-    arr = NULL;
     p = NULL;
 
     return arr;
@@ -253,12 +250,16 @@ _bool_ deleteIPos(List const l, int pos)
     if(NULL == p)
     {
         printf("第%d个节点不存在!\n", pos - 1);
+
+        return _false_;
     }
     else
     {
         if(NULL == p->next)
         {
             printf("第%d个节点不存在!\n", pos);
+
+            return _false_;
         }
         else
         {
@@ -270,6 +271,8 @@ _bool_ deleteIPos(List const l, int pos)
             q = NULL;
         }
     }
+
+    return _true_;
 }
 
 /*链表置数*/
