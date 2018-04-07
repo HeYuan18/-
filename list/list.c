@@ -5,27 +5,21 @@
 	> Created Time: 2017年09月23日 星期六 14时36分06秒
  ************************************************************************/
 
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
-#include<unistd.h>
+#include"stdfx.h"
 
-#define _bool_      int
-#define _true_      0
-#define _false_     1
-#define _empty_     0
-#define _unempty_   1
-
-typedef int elementType;
-
-typedef struct node
+/*打印一维数组*/
+void printArr(const int* const arr, int len)
 {
-    elementType  data;
-    struct node* next;
-}Node;
-#define size_node sizeof(Node)
+    const int* p = arr;
+    int i = 0;
+    for (; i < len; ++i)
+    {
+        printf("%d\t", p[i]);
+    }
+    printf("\n");
 
-typedef Node* List;
+    p = NULL;
+}
 
 /*链表初始化*/
 List listInit()
@@ -117,13 +111,13 @@ int getLLen(const List l)
 }
 
 /*获取元素所在位置*/
-int* getEPos(const List l, elementType data)
+_bool_ getEPos(const List l, elementType data)
 {
     if(_empty_ == isEmpty(l))
     {
         printf("empty...\n");
-
-        return NULL;
+        
+        return _false_;
     }
 
     Node* p = l->next;
@@ -141,9 +135,13 @@ int* getEPos(const List l, elementType data)
         }
         ++count;
     }
+
+    printArr(arr, len);
+    free(arr);
+    arr = NULL;
     p = NULL;
 
-    return arr;
+    return _true_;
 }
 
 /*获取i号位置元素*/
@@ -330,20 +328,6 @@ void printList(const List const l)
     p = NULL;
 }
 
-/*打印一维数组*/
-void printArr(const int* const arr, int len)
-{
-    const int* p = arr;
-    int i = 0;
-    for (; i < len; ++i)
-    {
-        printf("%d\t", p[i]);
-    }
-    printf("\n");
-
-    p = NULL;
-}
-
 int main()
 {
     List list = listInit();
@@ -365,6 +349,9 @@ int main()
     list = insertTail(list, 9);
     list = insertTail(list, 10);
     printf("len=%d\n", getLLen(list));
+    printList(list);
+
+    list = reversion(list);
     printList(list);
 
     deleteIPos(list, 4);
