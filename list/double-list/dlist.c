@@ -67,6 +67,7 @@ Dlist insert_dlist(Dlist dl, elementType data)
         p->next = q;
         q->prev  = p;
         p = NULL;
+        q = NULL;
 
         return dl;
     }
@@ -76,6 +77,7 @@ Dlist insert_dlist(Dlist dl, elementType data)
     dl->next = q;
     p->prev = q;
     p = NULL;
+    q = NULL;
 
     return dl;
 }
