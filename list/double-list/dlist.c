@@ -7,6 +7,7 @@
 
 #include<stdio.h>
 #include<stdlib.h>
+#include<stdbool.h>
 
 typedef int elementType;
 typedef struct node
@@ -41,7 +42,25 @@ Dlist init_dlist(Dlist dl)
     return dl;
 }
 
-Dlist insert_dlist(Dlist dl, elementType data)
+bool is_empty(Dlist dl)
+{
+    if(NULL == dl)
+    {
+        printf("error: abnormal\n");
+
+        return true;
+    }
+    if(NULL == dl->next)
+    {
+        printf("dlistP: empty\n");
+
+        return true;
+    }
+
+    return false;
+}
+
+Dlist head_insert(Dlist dl, elementType data)
 {
     if(NULL == dl)
     {
@@ -82,13 +101,116 @@ Dlist insert_dlist(Dlist dl, elementType data)
     return dl;
 }
 
-void print_dlist(Dlist dl)
+Dlist tail_insert(Dlist dl, elementType data)
 {
-    if(NULL == dl || NULL == dl->next)
+    if(NULL == dl)
     {
         printf("error: abnormal\n");
 
-        return;
+        return dl;
+    }
+
+    Node* q = (Node*)malloc(sizeof(Node));
+    if(NULL == q)
+    {
+        printf("error: insert falure\n");
+
+        return dl;
+    }
+    q->prev = NULL;
+    q->data = data;
+    q->next = NULL;
+
+    Node* p = dl;
+    while(p->next)
+    {
+        p = p->next;
+    }
+    p->next = q;
+    q->prev = p;
+
+    p = NULL;
+    q = NULL;
+
+    return dl;
+}
+
+Node* get_node(Dlist dl, int position)  //起点->1
+{
+    if(true == is_empty(dl))
+    {
+        return NULL;
+    }
+
+    Node* p = dl->next;
+    while((--position) && (p))
+    {
+        p = p->next;
+    }
+
+    if(0 == position)
+    {
+        return p;
+    }
+
+    return NULL;
+}
+
+Dlist delete_node(Dlist dl, int position)
+{
+    if(true == is_empty(dl))
+    {
+        return dl;
+    }
+
+    if(1 == position)
+    {
+        Node* p = dl;
+        Node* q = dl->next;
+
+        p->next = q->next;
+        (q->next)->prev = p;
+        
+        free(q);
+        q = NULL;
+        p = NULL;
+
+        return dl;
+    }
+
+    Node* p = get_node(dl, position - 1);
+    if(NULL == p || NULL == p->next)
+    {
+        return dl;
+    }
+
+    Node* q = p->next;
+    if(NULL == q->next)
+    {
+        p->next = NULL;
+        
+        free(q);
+        q = NULL;
+        p = NULL;
+
+        return dl;
+    }
+
+    p->next = q->next;
+    (q->next)->prev = p;
+
+    free(q);
+    q = NULL;
+    p = NULL;
+
+    return dl;
+}
+
+void print_dlist(Dlist dl)
+{
+    if(true == is_empty(dl))
+    {
+        return ;
     }
 
     printf("dlistP:   ");
@@ -150,11 +272,21 @@ int main()
         return 0;
     }
     
-    DL = insert_dlist(DL, 5);
-    DL = insert_dlist(DL, 4);
-    DL = insert_dlist(DL, 3);
-    DL = insert_dlist(DL, 2);
-    DL = insert_dlist(DL, 1);
+    DL = head_insert(DL, 5);
+    DL = head_insert(DL, 4);
+    DL = head_insert(DL, 3);
+    DL = head_insert(DL, 2);
+    DL = head_insert(DL, 1);
+    DL = tail_insert(DL, 6);
+    DL = tail_insert(DL, 7);
+    DL = tail_insert(DL, 8);
+    DL = tail_insert(DL, 9);
+    DL = tail_insert(DL, 10);
+
+    print_dlist(DL);
+
+    DL = delete_node(DL, 6);
+    DL = delete_node(DL, 5);
 
     print_dlist(DL);
 
