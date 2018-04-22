@@ -125,7 +125,7 @@ List tail_insert(List l, elementType data)
     return l;
 }
 
-Node* get_Node(List l, int position)     //起点->1
+Node* get_node(List l, int position)     //起点->1
 {
     if(true == is_empty(l))
     {
@@ -139,7 +139,7 @@ Node* get_Node(List l, int position)     //起点->1
 
     }
 
-    if((0 == position))
+    if(0 == position)
     {
         return p;
     }
@@ -160,6 +160,7 @@ List delete_Node(List l, int position)
         Node* q = l->next;
 
         p->next = q->next;
+
         free(q);
         q = NULL;
         p = NULL;
@@ -167,7 +168,7 @@ List delete_Node(List l, int position)
         return l;
     }
 
-    Node *p = get_Node(l, position - 1);
+    Node *p = get_node(l, position - 1);
     if(NULL == p || NULL == p->next)
     {
         return l;
@@ -186,6 +187,7 @@ List delete_Node(List l, int position)
     
     p->next = q->next;          //case 2:中间节点
     q->next = NULL;
+
     free(q);
     q = NULL;
     p = NULL;
