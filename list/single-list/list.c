@@ -225,6 +225,60 @@ List reversion_list(List l)
     return l;
 }
 
+Node* recurrence_reversion(Node* pre, Node* cur)
+{
+    if(NULL == cur->next)
+    {
+        cur->next = pre;
+
+        return cur;
+    }
+
+    Node* next = cur->next;
+    cur->next = pre;
+    Node* head = recurrence_reversion(cur, next);
+
+    return head;
+}
+
+Node* recurrence_reversion_list(Node* root)     //真.递归版单链表逆置
+{
+    if(NULL == root)
+    {
+        return root;
+    }
+
+    return recurrence_reversion(NULL, root);
+}
+
+Node* recurrence_reversion_list0(Node* root)     //递归版单链表逆置
+{
+    if(NULL == root)
+    {
+        return root;
+    }
+
+    Node* p = recurrence_reversion_list0(root->next);
+    if(NULL == p)
+    {
+        return root;
+    }
+
+    Node* q = p;
+    while(q->next)
+    {
+        q = q->next;
+    }
+
+    q->next = root;
+    root->next = NULL;
+    root = p;
+    q = NULL;
+    p = NULL;
+    
+    return root;
+}
+
 void print_list(List l)
 {
     if(NULL == l)
@@ -303,7 +357,8 @@ int main()
     
     print_list(L);
 
-    L = reversion_list(L);
+    //L = reversion_list(L);
+    L->next = recurrence_reversion_list(L->next);
 
     print_list(L);
 
