@@ -20,12 +20,15 @@ typedef struct node
 typedef Node* List;
 typedef struct cycleList
 {
-    List    list;
     int     len;
+    List    list;
 }Clist;
 
-Clist init_clist(Clist cl)
+Clist init_clist(void)
 {
+    Clist cl;
+    cl.len = 0;
+    cl.list = NULL;
     cl.list = (Node*)malloc(sizeof(Node));
     if(NULL == cl.list)
     {
@@ -35,7 +38,6 @@ Clist init_clist(Clist cl)
     }
     cl.list->data = 0;
     cl.list->next = NULL;
-    cl.len = 0;
 
     return cl;
 }
@@ -229,7 +231,7 @@ Clist destory_list(Clist cl)
 
 int main()
 {
-    Clist Cl = init_clist(Cl);
+    Clist Cl = init_clist();
 
     Cl = head_insert(Cl, 5);
     Cl = head_insert(Cl, 4);
